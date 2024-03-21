@@ -1,9 +1,10 @@
 const app = require("./index");
 const dotenv = require("dotenv").config();
 const connectWithDb = require("./config/db");
+const mongoose = require("mongoose");
 
 const PORT = process.env.PORT || 4000;
-// connectWithDb();
+connectWithDb();
 
 //health api
 app.get("/health", (req, res) => {

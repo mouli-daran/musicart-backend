@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const app = express();
 const morgan = require("morgan");
-
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 // morgan import
@@ -19,13 +19,16 @@ app.use(function (req, res, next) {
   next();
 });
 
-//regular import
+//regular middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(cookieParser());
 
 //routes import
+const user = require("./routes/user");
 
 //routes middleware
+app.use("/api/v1/", user);
 
 module.exports = app;
