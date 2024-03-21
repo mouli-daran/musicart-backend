@@ -117,6 +117,9 @@ exports.addFeedback = BigPromise(async (req, res, next) => {
       feedbackText,
     };
 
+    if (!req.user.feedback) {
+      await req.user.populate("feedback").execPopulate();
+    }
     // Push the new feedback object into the feedback array of the user document
     req.user.feedback.push(newFeedback);
 

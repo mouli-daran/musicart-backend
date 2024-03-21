@@ -27,8 +27,10 @@ app.use(cookieParser());
 
 //routes import
 const user = require("./routes/user");
+const product = require("./routes/product");
 
 //routes middleware
 app.use("/api/v1/", user);
+app.use("/api/v1/", product);
 
 module.exports = app;
