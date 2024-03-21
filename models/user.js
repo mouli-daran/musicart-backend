@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
+const Product = require("../models/product");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -26,11 +27,19 @@ const userSchema = new mongoose.Schema({
     minLength: [6, "Password must be minimum 6 characters"],
     select: false,
   },
-  cart: {
-    type: Array,
-    required: false,
-    unique: false,
-  },
+  cart: [
+    {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      quantity: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
   feedback: [
     {
       typeOfFeedback: {
@@ -44,6 +53,11 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  orders: {
+    type: Array,
+    required: false,
+    unique: false,
+  },
 });
 
 //encrypt password before save -hooks
