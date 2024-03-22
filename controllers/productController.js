@@ -190,6 +190,7 @@ exports.placeOrder = BigPromise(async (req, res, next) => {
 
     // Create order object
     const order = {
+      _id: new mongoose.Types.ObjectId(),
       name: name,
       address: address,
       paymentMethod: paymentMethod,
@@ -216,6 +217,74 @@ exports.placeOrder = BigPromise(async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+exports.viewOrders = BigPromise(async (req, res, next) => {
+  try {
+    // Ensure user is authenticated
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Retrieve user's cart products
+    const user = await User.findById(req.user._id);
+
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Extract cart products from the user object
+    const orders = user.orders.map((order) => ({
+      orderId: order._id,
+      name: order.name,
+      address: order.address,
+      products: order.products,
+      orderTime: order.orderTime,
+      // Add other order details as needed
+    }));
+
+    res.status(200).json({
+      status: "SUCCESS",
+      data: orders,
+    });
+  } catch (error) {
+    console.error("Error fetching cart products:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+exports.getOrderById = BigPromise(async (req, res, next) => {
+  try {
+    const orderId = req.params.orderId; // Assuming the order ID is provided in the request parameters
+
+    // Fetch user's orders
+    const user = await User.findById(req.user._id); // Assuming orders are associated with users
+
+    console.log("the user is ----", user.orders);
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the order with the specified order ID
+    const order = user.orders.find((order) => order._id.toString() === orderId);
+
+    console.log("the order issdsdsds", order);
+
+    // Check if the order was found
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({
+      status: "SUCCESS",
+      data: order,
+    });
+  } catch (error) {
+    console.error("Error finding order:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
